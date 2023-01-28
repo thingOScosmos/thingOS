@@ -21,11 +21,46 @@ namespace ThingOS
      |     ||   by Josiah
      '-----'`
 ");
+            Login();
+            
+        }
+
+        void Login()
+        {
+            if (File.Exists(@"0:\thingSys\thing.info"))
+            {
+                var infoRaw = File.ReadAllText(@"0:\thingSys\thing.info");
+                var info = infoRaw.Split("|");
+
+                // 3 fields
+                var pcName = info[0];
+                var userName = info[1];
+                var password = info[2];
+
+                Console.WriteLine(@$"Hello {userName}! You're logging into {pcName}. Input your password here!");
+                if (Console.ReadLine() != password)
+                {
+                    // hmm... yep nobody cares!
+                }
+            } else
+            {
+                Console.BackgroundColor = ConsoleColor.Blue;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("ThingOS Setup - Info");
+                Console.WriteLine("---------------------");
+                Console.WriteLine("Welcome to ThingOS! The setup will begin by pressing a key.");
+                Console.ReadKey();
+                Console.Clear();
+                Console.WriteLine("What is the name of this PC? Will default to THINGPC followed by 3 numbers.");
+                var pcName = Console.ReadLine();
+                
+            }
         }
 
         protected override void Run()
         {
-            Console.Write("thing@josiah: ");
+            var drive = new DriveInfo("0");
+            Console.Write("thing@you: ");
             var input = Console.ReadLine();
 
 
@@ -41,7 +76,7 @@ namespace ThingOS
                 try
                 {
                     string[] filePaths = Directory.GetFiles(@"0:\");
-                    var drive = new DriveInfo("0");
+                    drive = new DriveInfo("0");
                     Console.WriteLine("Volume in drive 0 is " + $"{drive.VolumeLabel}");
                     Console.WriteLine("Directory of " + @"0:\");
                     Console.WriteLine("\n");
@@ -95,6 +130,24 @@ namespace ThingOS
             } else if (args[0] == "rfile")
             {
                 Console.WriteLine(File.ReadAllText("0:\\" + Directory.GetCurrentDirectory() + "\\" + args[1]));
+            } else if (args[0] == "touch") {
+                
+                foreach (string i in args)
+                {
+                    if (i == "touch")
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        Sys.FileSystem.VFS.VFSManager.CreateFile(@"0:\" + i);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+                    }
+                    Console.WriteLine("Created " + i + ".");
+                }
             }
             else
             {
